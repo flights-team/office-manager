@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: office-manager
+  data:
+    mongodb:
+      database: office-manager
