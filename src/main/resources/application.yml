@@ -4,3 +4,11 @@ spring:
   data:
     mongodb:
       database: office-manager
+  rabbitmq:
+    host: localhost
+    template:
+      exchange: topic
+      queues: office, flights
+
+
+
