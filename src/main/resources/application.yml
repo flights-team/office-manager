@@ -8,7 +8,9 @@ spring:
     host: localhost
     template:
       exchange: topic
-      queues: office, flights
+      queues:
+        office-queue: office
+        board-queue: board
 
 
 

@@ -19,23 +19,28 @@ public class RabbitMQConfig {
 
     @Value("${spring.rabbitmq.template.exchange}")
     private String exchangeName;
-    @Value("${spring.rabbitmq.template.queues}")
-    private List<String> queues;
+    @Value("${spring.rabbitmq.template.queues.office-queue}")
+    private String officeQueue;
+    @Value("${spring.rabbitmq.template.queues.board-queue}")
+    private String boardQueue;
 
-
-    private TopicExchange topicExchange(){
+    @Bean
+    public TopicExchange topicExchange(){
         return new TopicExchange(exchangeName);
     }
 
-    @PostConstruct
-    public void configureQueues(){
-        TopicExchange topicExchange = topicExchange();
-        amqpAdmin.declareExchange(topicExchange);
-        queues.forEach(queueName ->{
-            Queue queue = new Queue(queueName);
-            amqpAdmin.declareQueue(queue);
-            amqpAdmin.declareBinding(BindingBuilder.bind(queue).to(topicExchange).with(queueName + ".#"));
-        });
+    @Bean
+    public Binding officeQueue(TopicExchange topicExchange){
+        var queue = new Queue(officeQueue);
+        amqpAdmin.declareQueue(queue);
+        return BindingBuilder.bind(queue).to(topicExchange).with( officeQueue + ".#");
+    }
+
+    @Bean
+    public Binding boardQueue(TopicExchange topicExchange){
+        var queue = new Queue(boardQueue);
+        amqpAdmin.declareQueue(queue);
+        return BindingBuilder.bind(queue).to(topicExchange).with( boardQueue + ".#");
     }
 
     @Bean
