@@ -1,17 +1,16 @@
 package com.artur.office_manager.config;
 
-import jakarta.annotation.PostConstruct;
+import com.artur.common.message.converter.MessageConverter;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
+@Getter
 @RequiredArgsConstructor
 @Configuration
 public class RabbitMQConfig {
@@ -46,6 +45,11 @@ public class RabbitMQConfig {
     @Bean
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory){
         return new RabbitTemplate(connectionFactory);
+    }
+
+    @Bean
+    public MessageConverter messageConverter(){
+        return new MessageConverter();
     }
 
 }

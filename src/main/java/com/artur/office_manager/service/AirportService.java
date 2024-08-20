@@ -2,8 +2,12 @@ package com.artur.office_manager.service;
 
 import com.artur.common.bean.office.AirPort;
 import com.artur.common.bean.office.Office;
+import com.artur.common.message.BoardMessage;
+import com.artur.common.message.OfficeMessage;
+import com.artur.common.message.Type;
 import com.artur.common.model.Position;
 import com.artur.office_manager.exception.NotFoundException;
+import com.artur.office_manager.message.producer.RabbitMessageProducer;
 import com.artur.office_manager.repository.AirportRepository;
 import com.artur.office_manager.request.AirportCreateRequest;
 import com.artur.office_manager.request.AirportUpdateRequest;
@@ -20,6 +24,8 @@ public class AirportService implements OfficeService{
 
     @Autowired
     private AirportRepository airportRepository;
+    @Autowired
+    private RabbitMessageProducer rabbitMessageProducer;
 
     @Override
     public Office getById(String id) throws NotFoundException {
@@ -35,7 +41,7 @@ public class AirportService implements OfficeService{
     @Override
     public Office create(CreateRequest createRequest){
         AirportCreateRequest airportCreateRequest = (AirportCreateRequest) createRequest;
-        return airportRepository.save(new AirPort(
+        AirPort saved = airportRepository.save(new AirPort(
                 genId(),
                 airportCreateRequest.name(),
                 Position.builder()
@@ -44,6 +50,8 @@ public class AirportService implements OfficeService{
                         .angle(0f)
                         .build()
         ));
+        rabbitMessageProducer.sendOfficeMessage(new OfficeMessage(saved, Type.CREATE));
+        return saved;
     }
 
     private String genId(){
@@ -67,11 +75,14 @@ public class AirportService implements OfficeService{
         if(airportUpdateRequest.positionY() != null){
             airPort.getPosition().setX(airportUpdateRequest.positionY());
         }
-        return airportRepository.save(airPort);
+        AirPort saved = airportRepository.save(airPort);
+        rabbitMessageProducer.sendOfficeMessage(new OfficeMessage(saved, Type.UPDATE));
+        return saved;
     }
 
     @Override
     public void deleteById(String id) {
         airportRepository.deleteById(id);
+        rabbitMessageProducer.sendOfficeMessage(new OfficeMessage(null, Type.DELETE));
     }
 }

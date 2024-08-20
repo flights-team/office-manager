@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @ActiveProfiles("dev")
 @SpringBootTest
-class OfficeManagerApplicationTests {
+public class OfficeManagerApplicationTests {
 
 	@Test
 	void contextLoads() {
